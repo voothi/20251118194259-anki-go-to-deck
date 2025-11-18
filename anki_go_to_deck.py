@@ -1,6 +1,5 @@
 from aqt import mw
 from aqt.gui_hooks import browser_will_show_context_menu
-from aqt.utils import tooltip
 from aqt.qt import QTreeWidgetItemIterator
 
 def expand_and_select_legacy(browser, deck_name):
@@ -39,10 +38,7 @@ def filter_by_card_deck(browser):
     
     browser.setFilter(f'deck:"{deck_name}"')
     
-    success_legacy = expand_and_select_legacy(browser, deck_name)
-    
-    if not success_legacy:
-        tooltip(f"Deck:\n{deck_name}")
+    expand_and_select_legacy(browser, deck_name)
 
 def on_context_menu(browser, menu):
     action = menu.addAction("Go to Deck")
