@@ -1,10 +1,15 @@
-import json
 from aqt import mw
 from aqt.gui_hooks import browser_will_show_context_menu
-from aqt.qt import QTreeWidgetItemIterator, QTimer, QWebEnginePage
+from aqt.qt import (
+    QTreeWidgetItemIterator, 
+    QApplication, 
+    Qt, 
+    QKeyEvent, 
+    QEvent, 
+    QTimer
+)
 
 def expand_and_select_legacy(browser, deck_name):
-    """Legacy method for Anki < 2.1.50 (Qt-based sidebar)"""
     try:
         tree = browser.form.searchTree
     except AttributeError:
@@ -18,48 +23,52 @@ def expand_and_select_legacy(browser, deck_name):
             while parent:
                 parent.setExpanded(True)
                 parent = parent.parent()
+            
             tree.setCurrentItem(item)
             item.setSelected(True)
             tree.scrollToItem(item)
             return True
+        
         iterator += 1
+    
     return False
 
-def filter_sidebar_modern_paste(browser, deck_name):
-    """
-    Modern method: Copies deck name to clipboard and triggers Paste 
-    into the sidebar search box.
-    """
-    try:
-        sidebar_web = browser.sidebar.web
-    except AttributeError:
-        return
+def simulate_key(widget, key, modifiers=Qt.KeyboardModifier.NoModifier):
+    e_press = QKeyEvent(QEvent.Type.KeyPress, key, modifiers)
+    e_release = QKeyEvent(QEvent.Type.KeyRelease, key, modifiers)
+    QApplication.postEvent(widget, e_press)
+    QApplication.postEvent(widget, e_release)
 
-    # 1. Get the leaf name (e.g. "Child" from "Parent::Child")
+def filter_sidebar_modern_keyboard(browser, deck_name):
+    # 1. Copy the leaf deck name to the clipboard
     leaf_name = deck_name.split("::")[-1]
-    
-    # 2. Copy to system Clipboard
-    mw.app.clipboard().setText(leaf_name)
+    QApplication.clipboard().setText(leaf_name)
 
-    # 3. JS: Focus the input and Select All (to overwrite existing text)
-    # This mimics hitting Ctrl+Shift+F
-    js_code = """
-    (function() {
-        var input = document.querySelector("input[type='text']") || document.querySelector("input");
-        if (input) {
-            input.focus();
-            input.select();
-        }
-    })();
-    """
-    sidebar_web.eval(js_code)
+    # 2. Emulate Ctrl+Shift+F to focus the sidebar filter
+    # We send the event to the browser window to trigger the global shortcut
+    simulate_key(
+        browser, 
+        Qt.Key.Key_F, 
+        Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
+    )
 
-    # 4. Trigger 'Paste' action after a tiny delay to allow focus to settle
-    def trigger_paste():
-        # WebAction.Paste is usually enum value 6
-        sidebar_web.triggerPageAction(QWebEnginePage.WebAction.Paste)
-    
-    QTimer.singleShot(50, trigger_paste)
+    def step_paste_and_enter():
+        # 3. Get the currently focused widget (should be the sidebar input now)
+        focus_widget = QApplication.focusWidget()
+        
+        if focus_widget:
+            # Emulate Ctrl+V (Paste)
+            simulate_key(
+                focus_widget, 
+                Qt.Key.Key_V, 
+                Qt.KeyboardModifier.ControlModifier
+            )
+            
+            # 4. Emulate Enter after a short delay to allow paste to complete
+            QTimer.singleShot(50, lambda: simulate_key(focus_widget, Qt.Key.Key_Return))
+
+    # Wait 150ms for the Ctrl+Shift+F focus change to happen
+    QTimer.singleShot(150, step_paste_and_enter)
 
 def filter_by_card_deck(browser):
     cids = browser.selectedCards()
@@ -69,15 +78,15 @@ def filter_by_card_deck(browser):
     card = mw.col.get_card(cids[0])
     deck_name = mw.col.decks.name(card.did)
     
-    # 1. Filter main list (standard method)
+    # Standard main view filter
     browser.setFilter(f'deck:"{deck_name}"')
     
-    # 2. Try Legacy sidebar (for old Anki)
+    # Try Legacy method
     is_legacy = expand_and_select_legacy(browser, deck_name)
     
-    # 3. If not legacy, use the Clipboard+Paste Hack
+    # If not legacy, use Keyboard Emulation method
     if not is_legacy:
-        filter_sidebar_modern_paste(browser, deck_name)
+        filter_sidebar_modern_keyboard(browser, deck_name)
 
 def on_context_menu(browser, menu):
     action = menu.addAction("Go to Deck")
