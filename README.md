@@ -13,6 +13,8 @@ This utility solves a common navigation friction in the Anki Browser. Instead of
   - [Features](#features)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+    - [Option A: Install via AnkiWeb (Recommended)](#option-a-install-via-ankiweb-recommended)
+    - [Option B: Manual Installation](#option-b-manual-installation)
   - [Configuration](#configuration)
     - [`enable_sidebar_clipboard_hack`](#enable_sidebar_clipboard_hack)
   - [Usage](#usage)
@@ -37,6 +39,24 @@ This utility solves a common navigation friction in the Anki Browser. Instead of
 
 ## Installation
 
+### Option A: Install via AnkiWeb (Recommended)
+
+The easiest way to install the add-on is through Anki's built-in add-on manager.
+
+1.  Open Anki.
+2.  Go to **Tools** -> **Add-ons** -> **Get Add-ons...**
+3.  Paste the following code into the box:
+    ```text
+    1158865515
+    ```
+4.  Click **OK** and restart Anki.
+
+*View on AnkiWeb: [Go to Deck (Browser Context Menu)](https://ankiweb.net/shared/info/1158865515)*
+
+### Option B: Manual Installation
+
+If you prefer to install from source or modify the code:
+
 **Step 1: Open the Add-ons Folder**
 1.  Open Anki.
 2.  Go to **Tools** -> **Add-ons** -> **View Files**.
@@ -58,7 +78,6 @@ addons21/
     ├── __init__.py
     ├── anki_go_to_deck.py
     └── config.json
-    └── config.json.template
 ```
 
 **Step 4: Restart Anki**
