@@ -58,6 +58,7 @@ addons21/
     ├── __init__.py
     ├── anki_go_to_deck.py
     └── config.json
+    └── config.json.template
 ```
 
 **Step 4: Restart Anki**
