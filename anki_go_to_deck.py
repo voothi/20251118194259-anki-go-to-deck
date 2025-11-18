@@ -40,35 +40,36 @@ def simulate_key(widget, key, modifiers=Qt.KeyboardModifier.NoModifier):
     QApplication.postEvent(widget, e_release)
 
 def filter_sidebar_modern_keyboard(browser, deck_name):
-    # 1. Copy the leaf deck name to the clipboard
     leaf_name = deck_name.split("::")[-1]
     QApplication.clipboard().setText(leaf_name)
 
-    # 2. Emulate Ctrl+Shift+F to focus the sidebar filter
-    # We send the event to the browser window to trigger the global shortcut
     simulate_key(
         browser, 
         Qt.Key.Key_F, 
         Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
     )
 
-    def step_paste_and_enter():
-        # 3. Get the currently focused widget (should be the sidebar input now)
+    def step_clear_paste_enter():
         focus_widget = QApplication.focusWidget()
         
         if focus_widget:
-            # Emulate Ctrl+V (Paste)
+            simulate_key(
+                focus_widget, 
+                Qt.Key.Key_A, 
+                Qt.KeyboardModifier.ControlModifier
+            )
+            
+            simulate_key(focus_widget, Qt.Key.Key_Backspace)
+            
             simulate_key(
                 focus_widget, 
                 Qt.Key.Key_V, 
                 Qt.KeyboardModifier.ControlModifier
             )
             
-            # 4. Emulate Enter after a short delay to allow paste to complete
             QTimer.singleShot(50, lambda: simulate_key(focus_widget, Qt.Key.Key_Return))
 
-    # Wait 150ms for the Ctrl+Shift+F focus change to happen
-    QTimer.singleShot(150, step_paste_and_enter)
+    QTimer.singleShot(150, step_clear_paste_enter)
 
 def filter_by_card_deck(browser):
     cids = browser.selectedCards()
@@ -78,13 +79,10 @@ def filter_by_card_deck(browser):
     card = mw.col.get_card(cids[0])
     deck_name = mw.col.decks.name(card.did)
     
-    # Standard main view filter
     browser.setFilter(f'deck:"{deck_name}"')
     
-    # Try Legacy method
     is_legacy = expand_and_select_legacy(browser, deck_name)
     
-    # If not legacy, use Keyboard Emulation method
     if not is_legacy:
         filter_sidebar_modern_keyboard(browser, deck_name)
 
