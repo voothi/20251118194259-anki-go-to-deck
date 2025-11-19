@@ -33,7 +33,7 @@ This utility solves a common navigation friction in the Anki Browser. Instead of
     -   **Legacy Anki (Qt5)**: Automatically expands the sidebar tree and highlights the specific deck folder.
     -   **Modern Anki (2.1.50+ / Qt6)**: Applies the search filter by default. Optionally, it can visually expand the sidebar using an advanced input simulation method (see [Configuration](#configuration)).
 
-[Back to Top](#table-of-contents)
+[Return to Top](#table-of-contents)
 
 ## Prerequisites
 
@@ -86,7 +86,7 @@ addons21/
 **Step 4: Restart Anki**
 Restart the application for the add-on to load.
 
-[Back to Top](#table-of-contents)
+[Return to Top](#table-of-contents)
 
 ## Configuration
 
@@ -107,7 +107,7 @@ This add-on includes a `config.json` file to control advanced behavior for moder
 **⚠️ Important Note for the "True" setting:**
 To achieve this on modern Anki, the script copies the deck name to your **system clipboard** and simulates a keyboard sequence (`Ctrl+Shift+F` -> `Ctrl+A` -> `Delete` -> `Ctrl+V` -> `Enter`). Enable this only if you are comfortable with the add-on briefly using your clipboard when you click "Go to Deck".
 
-[Back to Top](#table-of-contents)
+[Return to Top](#table-of-contents)
 
 ## Usage
 
@@ -116,7 +116,7 @@ To achieve this on modern Anki, the script copies the deck name to your **system
 3.  Select **Go to Deck** from the context menu.
 4.  The browser will immediately filter the list to show only cards from that deck.
 
-[Back to Top](#table-of-contents)
+[Return to Top](#table-of-contents)
 
 ## Compatibility Notes
 
@@ -124,16 +124,16 @@ To achieve this on modern Anki, the script copies the deck name to your **system
 -   **Legacy Versions**: On older versions of Anki where the sidebar is a standard Qt Widget, this add-on will visually expand the tree and select the deck item automatically (ignoring `config.json`).
 -   **Modern Versions (2.1.50+)**: Visual sidebar highlighting is disabled by default due to technical restrictions. It can be enabled by setting `"enable_sidebar_clipboard_hack": true` in the configuration file.
 
-[Back to Top](#table-of-contents)
+[Return to Top](#table-of-contents)
 
 ## Kardenwort Ecosystem
 
 This project is part of the **[Kardenwort](https://github.com/kardenwort)** environment, designed to create a focused and efficient learning ecosystem.
 
-[Back to Top](#table-of-contents)
+[Return to Top](#table-of-contents)
 
 ## License
 
 [MIT](./LICENSE)
 
-[Back to Top](#table-of-contents)
+[Return to Top](#table-of-contents)
